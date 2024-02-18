@@ -30,7 +30,9 @@ export default function Home() {
       const data = await invoke<string>("on_button_clicked")
         .then(async (value) => {
           // console.log("TRIGGERED WITHIN REACT", value)
-          createData(value)
+          if (!(value[0] === "BROKEN")) {
+            createData(value)
+          }
           const data = await getDailyData().then((res) => {
             return res
           })
@@ -39,8 +41,6 @@ export default function Home() {
         .catch(() => {
           console.log("TRIGGERED WITHIN")
         })
-      console.log("FUDGEE")
-      console.log(data)
       setActivityList(data)
     }, 5000) // 5000 milliseconds = 5 seconds
 
@@ -69,9 +69,9 @@ export default function Home() {
         <div className="flex-1 bg-slate-900 h-screen p-4">
           <RightColumn activityList={activityList} />
         </div>
-        {/*<div>
+        {/* <div>
           <button onClick={onButtonClick}>CLICK ME MOTHERFUCKER</button>
-        </div>*/}
+        </div> */}
       </div>
     </div>
   )

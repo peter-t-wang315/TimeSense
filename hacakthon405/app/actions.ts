@@ -125,7 +125,6 @@ export async function getData(startTimestamp, queryString) {
         console.error("Error querying database:", err.message)
         reject(err)
       } else {
-        console.log("Row", rows)
         resolve(rows)
       }
     })
@@ -142,9 +141,6 @@ async function getDataEndTime(startTimestamp, endTimestamp, queryString) {
         console.error("Error querying database:", err.message)
         reject(err)
       } else {
-        // console.log("Row", rows)
-        // const date = new Date(startTimestamp)
-        // console.log("startTimestamp:", date.toString())
         resolve(rows)
       }
     })
@@ -162,8 +158,6 @@ export async function getDailyData() {
 export async function getWeeklyData() {
   const startOfDay = new Date()
   const startOfDayTimestamp = startOfDay.getTime() - 604800000
-
-  console.log(startOfDayTimestamp)
 
   return getData(startOfDayTimestamp, query)
 }
