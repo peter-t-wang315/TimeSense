@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getMonthlyData } from "./actions"
 
 const localizer = momentLocalizer(moment)
 
@@ -41,6 +42,13 @@ export default function RightColumn({ activityList }: any) {
 
   useEffect(() => {
     async function generateCalendarEvents() {
+      const monthData = getMonthlyData().then((res) => {
+        return res
+      })
+      let startDate = new Date(2024, 1, 1, 0, 0, 0, 0)
+
+      console.log("monthdata", monthData)
+
       function generateEvents(date: any) {
         const events = [
           {
@@ -127,7 +135,6 @@ export default function RightColumn({ activityList }: any) {
             </div>
             <div className="mx-auto overflow-y-auto">
               {messages.map((message: any, index: any) => {
-                console.log(message)
                 return (
                   <div
                     key={index}

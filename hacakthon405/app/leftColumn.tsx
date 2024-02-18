@@ -65,9 +65,7 @@ export default function LeftColumn({ activityList }: any) {
   })
   // console.log(timeRestrictions)
   useEffect(() => {
-    console.log("parent changing")
     setData(activityList)
-    console.log("parent changing")
 
     const sortedActivityList = [...activityList].sort(
       (a, b) => b.totalSeconds - a.totalSeconds
@@ -81,7 +79,6 @@ export default function LeftColumn({ activityList }: any) {
 
     activityList.map(async (activity: any, index: number) => {
       const activitySeconds = activity.totalSeconds
-      console.log("MAPPING ACTIVITY: ", activity.application)
       sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
       if (
         activity.application === "Instagram" ||
@@ -93,8 +90,6 @@ export default function LeftColumn({ activityList }: any) {
         )
         /**/
 
-        console.log("Time limit: ", timeLimitSeconds)
-        console.log("Activity Seconds: ", activitySeconds)
         if (activitySeconds >= timeLimitSeconds) {
           // && activity % 60 === 0) {
           sendNotification("Tauri is awesome!")
@@ -158,10 +153,8 @@ export default function LeftColumn({ activityList }: any) {
                 .sort((a, b) => b.totalSeconds - a.totalSeconds)
                 .slice(0, 4)
                 .map((activity: any, index: any) => {
-                  console.log(activity)
                   // {application: 'Visual Studio Code', totalSeconds: 3080, timeString: '51 minute(s)'}
-                  console.log(svgDictionary)
-                  console.log(activity.application)
+
                   // console.log(svgDictionary[activity.application])
                   const formattedTimeString = activity.timeString
                     .replace(/\bhour(s)?\b/g, "h")
