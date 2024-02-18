@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 788,
-        "resizable": true,
+        "height": 811,
+        "resizable": false,
         "title": "hacakthon405Title",
-        "width": 1400
+        "width": 1444
       }
     ]
   }

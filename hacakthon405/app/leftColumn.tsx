@@ -28,11 +28,42 @@ import {
 } from "@/components/ui/dialog"
 import { useEffect, useState } from "react"
 import { svgDictionary } from "./svgDictionary"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from "@tauri-apps/api/notification"
+
+function stringToTimestamp(input: string): number {
+  const matches = input.match(/(\d+\s*h)?\s*(\d+\s*m)?/)
+  if (!matches) {
+    throw new Error(
+      "Invalid input format. Expected format: 'Xh Ym', 'Xh', or 'Ym'"
+    )
+  }
+
+  let hours = 0
+  if (matches[1]) {
+    hours = parseInt(matches[1], 10)
+  }
+
+  const minutes = parseInt(matches[matches.length - 1], 10)
+  return (hours * 60 + minutes) * 60
+}
 
 export default function LeftColumn({ activityList }: any) {
   // <h1 className="text-bold text-2xl text-white">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).replace(/(\d+)(st|nd|rd|th)/, '$1<sup>$2</sup>')}</h1>
   const [propsData, setData] = useState<any>(activityList)
-
+  const [safetyIsOpen, setSafetyIsOpen] = useState<any>(false)
+  const [timeIsOpen, setTimeIsOpen] = useState<any>(false)
+  const [timeRestrictions, setTimeRestrictions] = useState<any>({
+    Instagram: "1h 20m",
+    Discord: "1m",
+    YouTube: "20m",
+  })
+  // console.log(timeRestrictions)
   useEffect(() => {
     console.log("parent changing")
     setData(activityList)
@@ -47,7 +78,53 @@ export default function LeftColumn({ activityList }: any) {
     const values = sortedActivityList
       ?.slice(0, 5)
       .map((obj: any) => obj.totalSeconds)
+
+    activityList.map(async (activity: any, index: number) => {
+      const activitySeconds = activity.totalSeconds
+      console.log("MAPPING ACTIVITY: ", activity.application)
+      sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
+      if (
+        activity.application === "Instagram" ||
+        activity.application === "Discord" ||
+        activity.application === "YouTube"
+      ) {
+        const timeLimitSeconds = stringToTimestamp(
+          timeRestrictions[activity.application]
+        )
+        /**/
+
+        console.log("Time limit: ", timeLimitSeconds)
+        console.log("Activity Seconds: ", activitySeconds)
+        if (activitySeconds >= timeLimitSeconds) {
+          // && activity % 60 === 0) {
+          sendNotification("Tauri is awesome!")
+          sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
+
+          // console.log("OVER OVER OVER")
+        }
+      }
+    })
   }, [activityList])
+
+  useEffect(() => {
+    async function getPermissions() {
+      let permissionGranted = await isPermissionGranted()
+      if (!permissionGranted) {
+        const permission = await requestPermission()
+        permissionGranted = permission === "granted"
+      }
+      sendNotification("Tauri is awesome!")
+      sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
+    }
+    getPermissions()
+  }, [])
+
+  function convertToHoursMinutes(totalSeconds: number) {
+    const hours = Math.floor(totalSeconds / 3600) // Get the whole hours
+    const remainingSeconds = totalSeconds % 3600 // Get the remaining seconds
+    const minutes = Math.floor(remainingSeconds / 60) // Get the whole minutes
+    return { hours, minutes }
+  }
 
   return (
     <>
@@ -72,36 +149,36 @@ export default function LeftColumn({ activityList }: any) {
           </div>
         </div>
         <div className=" text-white p-4 pt-0 h-screen">
-          <div className="flex flex-col pt-16 mt-2">
+          <div className="flex flex-col pt-8 mt-2">
             <h3 className="text-lg text-left font-semibold pb-2">
               Top Activity
             </h3>
             <div className="flex flex-col">
               {[...activityList]
                 .sort((a, b) => b.totalSeconds - a.totalSeconds)
-                .slice(0, 3)
+                .slice(0, 4)
                 .map((activity: any, index: any) => {
                   console.log(activity)
                   // {application: 'Visual Studio Code', totalSeconds: 3080, timeString: '51 minute(s)'}
                   console.log(svgDictionary)
                   console.log(activity.application)
-                  console.log(svgDictionary[activity.application])
+                  // console.log(svgDictionary[activity.application])
+                  const formattedTimeString = activity.timeString
+                    .replace(/\bhour(s)?\b/g, "h")
+                    .replace(/\bminute(s)?\b/g, "m")
                   return (
                     <div
                       className="flex flex-row justify-between pt-3"
                       key={index}
                     >
                       <div className="flex flex-row">
-                        {
-                          //@ts-ignore
-                          svgDictionary[activity.application] || <h1>HELLOO</h1>
-                        }
-
-                        <h1 className="pl-3 text-lg font-light">
+                        <h1 className="text-lg font-light">
                           {activity.application}
                         </h1>
                       </div>
-                      <h1 className="pr-3 text-lg font-light">1h 31m</h1>
+                      <h1 className="pr-3 text-lg font-light">
+                        {formattedTimeString}
+                      </h1>
                     </div>
                   )
                 })}
@@ -151,14 +228,15 @@ export default function LeftColumn({ activityList }: any) {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuItem>Profile</DropdownMenuItem>
-                      <DropdownMenuItem>Billing</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTimeIsOpen(true)}>
+                        Time Restrictions
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Settings</DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSafetyIsOpen(true)}>
                         Data Safety Policy
                         {/*<DropdownMenuShortcut>⌘K</DropdownMenuShortcut>*/}
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
-
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       Log out
@@ -166,6 +244,123 @@ export default function LeftColumn({ activityList }: any) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                <Dialog
+                  open={safetyIsOpen}
+                  onOpenChange={() => setSafetyIsOpen(false)}
+                >
+                  <DialogContent className="sm:max-w-[650px]">
+                    <DialogHeader>
+                      <DialogTitle>Data Safety Policy</DialogTitle>
+                      <DialogDescription>
+                        <p className="text-xl pt-4 text-gray-100">
+                          All data used for tracking your websites is stored
+                          100% locally and is impossible for us to recover in
+                          any sense.
+                        </p>
+                        <p className="text-xl pt-4 text-gray-100">
+                          You can trust that when you use this service, all of
+                          your data is local to your own machine.
+                        </p>
+                        <p className="text-xl pt-4 text-gray-100">
+                          Whenever you want, you can delete the entirety of your
+                          data from this service by using the delete button
+                          below. You can also download a CSV of the entirety of
+                          your data and save it elsewhere.
+                        </p>
+                        <div className="flex justify-between text-lg pt-4">
+                          <Button
+                            variant="outline"
+                            className="text-sm text-white"
+                          >
+                            Download Data CSV
+                          </Button>
+                          <Button variant="destructive" className="text-sm">
+                            Delete The Entirety Of My Data, Forever.
+                          </Button>
+                        </div>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog
+                  open={timeIsOpen}
+                  onOpenChange={() => setTimeIsOpen(false)}
+                >
+                  <DialogContent className="sm:max-w-[650px]">
+                    <DialogHeader>
+                      <DialogTitle>Time Restrictions</DialogTitle>
+                      <DialogDescription>
+                        <p className="text-xl pt-4 text-gray-100">
+                          Here you can manage the time restrictions you have for
+                          the activity on your computer.
+                        </p>
+                        <p className="text-xl pt-4 text-gray-100 pb-4">
+                          Once you reach a restriction, you will receive a
+                          notification every minute that you are beyond your
+                          time limit.
+                        </p>
+                        <div className="flex justify-center align-middle">
+                          <h3 className="text-xl text-white pr-3 pt-1.5">
+                            YouTube
+                          </h3>
+                          <Input
+                            type="text"
+                            id="email"
+                            placeholder="Enter a total time allowed (ex: 1h 30m)"
+                            className="text-white text-xl ml-11 "
+                            value={timeRestrictions["YouTube"]}
+                            onChange={(e) => {
+                              setTimeRestrictions((prevState: any) => ({
+                                ...prevState,
+                                YouTube: e.target.value,
+                              }))
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex justify-center align-middle mt-3">
+                          <h3 className="text-xl text-white pr-3 pt-1.5">
+                            Instagram
+                          </h3>
+                          <Input
+                            type="text"
+                            id="email"
+                            placeholder="Enter a total time allowed (ex: 1h 30m)"
+                            className="text-white text-xl ml-7"
+                            value={timeRestrictions["Instagram"]}
+                            onChange={(e) => {
+                              setTimeRestrictions((prevState: any) => ({
+                                ...prevState,
+                                Instagram: e.target.value,
+                              }))
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex justify-center align-middle mt-3">
+                          <h3 className="text-xl text-white pr-3 pt-1.5">
+                            Discord
+                          </h3>
+                          <Input
+                            type="text"
+                            id="email"
+                            placeholder="Enter a total time allowed (ex: 1h 30m)"
+                            className="text-white text-xl ml-12"
+                            value={timeRestrictions["Discord"]}
+                            onChange={(e) => {
+                              setTimeRestrictions((prevState: any) => ({
+                                ...prevState,
+                                Discord: e.target.value,
+                              }))
+                            }}
+                          />
+                        </div>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>

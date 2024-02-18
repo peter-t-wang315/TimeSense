@@ -1,5 +1,5 @@
 export const svgDictionary = {
-  Discord: (
+  Discord: `
     <svg
       width="30px"
       height="30px"
@@ -25,9 +25,9 @@ export const svgDictionary = {
         </g>
       </g>
     </svg>
-  ),
+  `,
   "Visual Studio Code": <></>,
-  YouTube: (
+  YouTube: `
     <svg
       width="30px"
       height="30px"
@@ -70,8 +70,7 @@ export const svgDictionary = {
           </g>{" "}
         </g>{" "}
       </g>
-    </svg>
-  ),
+    </svg>`,
   Facebook: <></>,
   Baidu: <></>,
   Wikipedia: <></>,

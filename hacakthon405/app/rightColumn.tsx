@@ -93,7 +93,7 @@ export default function RightColumn({ activityList }: any) {
           events={calendarEvents}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: 700, maxWidth: 1000 }}
+          style={{ height: 700, maxWidth: 1050 }}
         />
         <Dialog>
           <DialogTrigger asChild>
