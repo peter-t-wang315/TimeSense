@@ -1,30 +1,31 @@
 "use client"
-import Image from "next/image";
-import { invoke } from '@tauri-apps/api/tauri'
-import { useEffect } from "react";
+import Image from "next/image"
+import { invoke } from "@tauri-apps/api/tauri"
+import { useEffect } from "react"
+import { createData } from "./actions"
 
 export default function Home() {
-  const onButtonClick = () => {
-    console.log("??")
-
-  }
   useEffect(() => {
     const interval = setInterval(() => {
       // Code to run every 5 seconds
       invoke<string>("on_button_clicked")
         .then((value) => {
-          console.log("TRIGGERED WITHIN REACT");
+          console.log("TRIGGERED WITHIN REACT", value)
+          createData(value)
+          // postData(value)
         })
         .catch(() => {
-          console.log("TRIGGERED WITHIN");
+          console.log("TRIGGERED WITHIN")
         })
-    }, 5000); // 5000 milliseconds = 5 seconds
+    }, 5000) // 5000 milliseconds = 5 seconds
 
     // Cleanup function to clear the interval when component unmounts or effect re-runs
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
-
+  const onButtonClick = () => {
+    console.log("??")
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -99,7 +100,11 @@ export default function Home() {
           </p>
         </a>
 
-        <button onClick={() => { onButtonClick() }}>
+        <button
+          onClick={() => {
+            onButtonClick()
+          }}
+        >
           PETER IS SOMETHING
         </button>
 
@@ -121,5 +126,5 @@ export default function Home() {
         </a>
       </div>
     </main>
-  );
+  )
 }

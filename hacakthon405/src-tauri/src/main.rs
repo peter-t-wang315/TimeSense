@@ -5,19 +5,28 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 use active_win_pos_rs::get_active_window;
 
-#[tauri::command]
-fn on_button_clicked() {
-  println!("I was invoked from JS!");
-  match get_active_window() {
-    Ok(active_window) => {
-        println!("active window: {:#?}", active_window);
-    },
-    Err(()) => {
-        println!("error occurred while getting the active window");
-    }
-  }
-  get_active_window();
+struct ActiveWindow {
+  title: String,
+  app_name: String,
+  // Other fields...
 }
+
+#[tauri::command]
+fn on_button_clicked() -> Result<(String, String), &'static str> {
+  match get_active_window() {
+      Ok(active_window) => {
+          println!("active window: {:#?}", active_window);
+          let title = active_window.title.clone();
+          let app_name = active_window.app_name.clone();
+          return Ok((title, app_name));
+      },
+      Err(()) => {
+          println!("error occurred while getting the active window");
+          return Err("Error getting active window");
+      }
+  }
+}
+
 
 fn main() {
   tauri::Builder::default()
