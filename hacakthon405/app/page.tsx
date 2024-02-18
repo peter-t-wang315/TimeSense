@@ -88,16 +88,17 @@ export default function Home() {
               let timeLimitSeconds = stringToTimestamp(
                 timeRestrictions[activity.application]
               )
-
+              console.log(activity.application)
+              console.log(activitySeconds)
+              console.log(timeLimitSeconds)
               if (
-                activitySeconds >= timeLimitSeconds &&
-                (activitySeconds - timeLimitSeconds) % 20 == 0 &&
+                activitySeconds >= timeLimitSeconds /*&&
                 lastPinged[activity.application] != activitySeconds /*||
                   ((activitySeconds - timeLimitSeconds) % 60 == 0 &&
                     lastPinged == activity.application))*/
               ) {
-                if (!hasPingedInitial) {
-                  /*sendNotification({
+                if ((activitySeconds - timeLimitSeconds) % 60 == 0) {
+                  sendNotification({
                     title: "TimeSense Alert",
                     body:
                       "You are over your time restriction for " +
@@ -105,12 +106,12 @@ export default function Home() {
                       " by " +
                       (activitySeconds - timeLimitSeconds) +
                       "seconds",
-                  })*/
+                  })
                   /*setHasPinged((prevState) => ({
                     ...prevState,
                     [activity.application]: activitySeconds,
                   }))*/
-                  setHasPingedInitial(true)
+                  // setHasPingedInitial(true)
                 }
 
                 setLastPinged(activity.application)

@@ -18,7 +18,7 @@ import { getMonthlyData } from "./actions"
 
 const localizer = momentLocalizer(moment)
 
-const OPENAI_API_KEY = "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"
+const OPENAI_API_KEY = ""
 
 export const LoadingSpinner = ({ className }: any) => {
   ;<>
