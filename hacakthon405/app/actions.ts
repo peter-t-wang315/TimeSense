@@ -47,7 +47,7 @@ export async function createData(values) {
   }
 
   const date = new Date()
-  const localTimestamp = date.getTime() - date.getTimezoneOffset() * 60 * 1000
+  const localTimestamp = date.getTime()
 
   const test = { $application: matchedItem, $timestamp: localTimestamp }
 
@@ -62,4 +62,29 @@ export async function createData(values) {
       }
     }
   )
+}
+
+export async function getDayData() {
+  db = new sqlite3.Database("./userData.db")
+
+  // Get the start of the current day
+  const startOfDay = new Date()
+  startOfDay.setHours(0, 0, 0, 0)
+  const startOfDayTimestamp = startOfDay.getTime()
+
+  console.log("Start of day", startOfDayTimestamp)
+
+  db.all(
+    "SELECT * FROM userData WHERE timestamp > ?",
+    startOfDayTimestamp,
+    (err, rows) => {
+      if (err) {
+        console.log("ERROR")
+        console.error("Error querying database:", err.message)
+      } else {
+        console.log("Rows", rows)
+      }
+    }
+  )
+  console.log("Query done")
 }

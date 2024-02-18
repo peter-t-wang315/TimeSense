@@ -2,7 +2,7 @@
 import Image from "next/image"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useEffect } from "react"
-import { createData } from "./actions"
+import { createData, getDayData } from "./actions"
 
 export default function Home() {
   useEffect(() => {
@@ -10,9 +10,8 @@ export default function Home() {
       // Code to run every 5 seconds
       invoke<string>("on_button_clicked")
         .then((value) => {
-          console.log("TRIGGERED WITHIN REACT", value)
+          // console.log("TRIGGERED WITHIN REACT", value)
           createData(value)
-          // postData(value)
         })
         .catch(() => {
           console.log("TRIGGERED WITHIN")
@@ -24,7 +23,7 @@ export default function Home() {
   }, [])
 
   const onButtonClick = () => {
-    console.log("??")
+    getDayData()
   }
 
   return (

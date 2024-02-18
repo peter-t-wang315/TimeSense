@@ -15,7 +15,7 @@ struct ActiveWindow {
 fn on_button_clicked() -> Result<(String, String), &'static str> {
   match get_active_window() {
       Ok(active_window) => {
-          println!("active window: {:#?}", active_window);
+          // println!("active window: {:#?}", active_window);
           let title = active_window.title.clone();
           let app_name = active_window.app_name.clone();
           return Ok((title, app_name));
