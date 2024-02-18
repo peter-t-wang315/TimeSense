@@ -1,6 +1,7 @@
 "use server"
 import sqlite3 from "sqlite3"
 import { open, Database } from "sqlite"
+import { resolve } from "path"
 
 // Let's initialize it as null initially, and we will assign the actual database instance later.
 let db = null
@@ -64,32 +65,34 @@ export async function createData(values) {
   )
 }
 
-export async function getDayData(startTimestamp) {
+export async function getData(startTimestamp) {
   db = new sqlite3.Database("./userData.db")
 
-  db.all(
-    "SELECT application, " +
-      "COUNT(*) * 5 AS totalSeconds, " +
-      "CASE " +
-      "WHEN COUNT(*) * 5 >= 60*60*24*7 THEN (COUNT(*) * 5 / (60*60*24*7)) || ' week(s)' " +
-      "WHEN COUNT(*) * 5 >= 60*60*24 THEN (COUNT(*) * 5 / (60*60*24)) || ' day(s)' " +
-      "WHEN COUNT(*) * 5 >= 60*60 THEN " +
-      "  FLOOR((COUNT(*) * 5) / (60*60)) || ' hour(s) ' || " +
-      "  FLOOR(((COUNT(*) * 5) % (60*60)) / 60) || ' minute(s)' " +
-      "WHEN COUNT(*) * 5 >= 60 THEN (COUNT(*) * 5 / 60) || ' minute(s)' " +
-      "WHEN COUNT(*) * 5 < 60 THEN '<1 minute' " +
-      "ELSE COUNT(*) * 5 || ' second(s)' " +
-      "END AS timeString " +
-      "FROM userData WHERE timestamp > ? GROUP BY application",
-    startTimestamp,
-    (err, rows) => {
-      if (err) {
-        console.log("ERROR")
-        console.error("Error querying database:", err.message)
-      } else {
-        console.log("Rows", rows)
+  return new Promise(function (resolve, reject) {
+    db.all(
+      "SELECT application, " +
+        "COUNT(*) * 5 AS totalSeconds, " +
+        "CASE " +
+        "WHEN COUNT(*) * 5 >= 60*60*24*7 THEN (COUNT(*) * 5 / (60*60*24*7)) || ' week(s)' " +
+        "WHEN COUNT(*) * 5 >= 60*60*24 THEN (COUNT(*) * 5 / (60*60*24)) || ' day(s)' " +
+        "WHEN COUNT(*) * 5 >= 60*60 THEN " +
+        "  FLOOR((COUNT(*) * 5) / (60*60)) || ' hour(s) ' || " +
+        "  FLOOR(((COUNT(*) * 5) % (60*60)) / 60) || ' minute(s)' " +
+        "WHEN COUNT(*) * 5 >= 60 THEN (COUNT(*) * 5 / 60) || ' minute(s)' " +
+        "WHEN COUNT(*) * 5 < 60 THEN '<1 minute' " +
+        "ELSE COUNT(*) * 5 || ' second(s)' " +
+        "END AS timeString " +
+        "FROM userData WHERE timestamp > ? GROUP BY application",
+      startTimestamp,
+      (err, rows) => {
+        if (err) {
+          console.log("ERROR")
+          console.error("Error querying database:", err.message)
+        } else {
+          console.log("Row", rows)
+          resolve(rows)
+        }
       }
-    }
-  )
-  console.log("Query done")
+    )
+  })
 }
