@@ -29,8 +29,20 @@ const PieChart = ({ activityList }: any) => {
         datasets: [
           {
             data: values,
-            borderColor: ["#16a34a", "#06b6d4", "#1d4ed8"],
-            backgroundColor: ["#16a34a", "#06b6d4", "#1d4ed8"],
+            borderColor: [
+              "#323D67",
+              "#8C909C",
+              "#6FAE9E",
+              "#A8DB83",
+              "#D1ECDF",
+            ],
+            backgroundColor: [
+              "#323D67",
+              "#8C909C",
+              "#6FAE9E",
+              "#A8DB83",
+              "#D1ECDF",
+            ],
             borderWidth: 2,
           },
         ],

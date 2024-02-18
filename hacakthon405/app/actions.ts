@@ -54,7 +54,7 @@ SELECT application,
     ORDER BY 
         totalSeconds DESC
     LIMIT 
-        5`
+        3`
 
 export async function createData(values) {
   if (!db) {

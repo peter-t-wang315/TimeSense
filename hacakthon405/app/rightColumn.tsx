@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getMonthlyData } from "./actions"
 
 const localizer = momentLocalizer(moment)
 
@@ -40,48 +41,67 @@ export default function RightColumn({ activityList }: any) {
   const [calendarEvents, setCalendarEvents] = useState<any>([])
 
   useEffect(() => {
-    async function generateCalendarEvents() {
-      function generateEvents(date: any) {
-        const events = [
-          {
-            title: "League of Legends " + "1h 26m",
-            start: new Date(date.setHours(13, 0, 0, 0)), // Set start time to 1pm
-            end: new Date(date.setHours(14, 0, 0, 0)), // Set end time to 2pm
-          },
-          {
-            title: "Discord",
-            start: new Date(date.setHours(14, 0, 0, 0)), // Set start time to 2pm
-            end: new Date(date.setHours(15, 0, 0, 0)), // Set end time to 3pm
-          },
-          {
-            title: "Instagram",
-            start: new Date(date.setHours(15, 0, 0, 0)), // Set start time to 3pm
-            end: new Date(date.setHours(16, 0, 0, 0)), // Set end time to 4pm
-          },
-        ]
+    if (activityList.length > 0) {
+      const sortedActivityList = [...activityList].sort(
+        (a, b) => b.totalSeconds - a.totalSeconds
+      )
 
-        return events
-      }
-      setCalendarEvents([
-        ...generateEvents(new Date("2024-02-02")),
-        ...generateEvents(new Date("2024-02-03")),
-        ...generateEvents(new Date("2024-02-04")),
-        ...generateEvents(new Date("2024-02-05")),
-        ...generateEvents(new Date("2024-02-06")),
-        ...generateEvents(new Date("2024-02-07")),
-        ...generateEvents(new Date("2024-02-08")),
-        ...generateEvents(new Date("2024-02-09")),
-        ...generateEvents(new Date("2024-02-10")),
-        ...generateEvents(new Date("2024-02-11")),
-        ...generateEvents(new Date("2024-02-12")),
-        ...generateEvents(new Date("2024-02-13")),
-        ...generateEvents(new Date("2024-02-14")),
-        ...generateEvents(new Date("2024-02-15")),
-        ...generateEvents(new Date("2024-02-16")),
-        ...generateEvents(new Date("2024-02-17")),
-      ])
-      return generateEvents(new Date("2024-02-01"))
+      const newCalendarEvents = [...calendarEvents]
+      newCalendarEvents.splice(-3)
+      const startDate = new Date()
+      startDate.setHours(0, 0, 0, 0)
+      let currentHour = 1
+      console.log("sorted activityList", sortedActivityList)
+
+      sortedActivityList.slice(0, 3).map((item, index) => {
+        const formattedTimeString = item.timeString
+          .replace(/\bhour(s)?\b/g, "h")
+          .replace(/\bminute(s)?\b/g, "m")
+
+        // Add calendar event for the current item
+        newCalendarEvents.push({
+          title: item.application + " " + formattedTimeString,
+          start: startDate.setHours(currentHour),
+          end: startDate.setHours(currentHour + 1),
+        })
+
+        currentHour += 1
+      })
+
+      console.log("iausd", newCalendarEvents)
+      // Update the state with the newCalendarEvents array
+      setCalendarEvents(newCalendarEvents)
     }
+  }, [activityList])
+
+  useEffect(() => {
+    async function generateCalendarEvents() {
+      const monthData = await getMonthlyData().then((res) => {
+        return res
+      })
+      let currentDate = new Date(2024, 1, 1, 0, 0, 0, 0)
+      currentDate.setDate(currentDate.getDate() - 1)
+
+      const modifiedData = monthData.flatMap((list) => {
+        currentDate.setDate(currentDate.getDate() + 1)
+        let currentHour = 1
+
+        return list.map((item) => {
+          const newItem = {
+            title: item.application + " " + item.timeString,
+            start: new Date(currentDate.setHours(currentHour)),
+            end: new Date(currentDate.setHours(currentHour + 1)),
+          }
+          currentHour++
+          return newItem
+        })
+      })
+
+      console.log("Modi", modifiedData)
+      setCalendarEvents(modifiedData)
+      return modifiedData[0]
+    }
+
     generateCalendarEvents()
   }, [])
 
@@ -127,7 +147,6 @@ export default function RightColumn({ activityList }: any) {
             </div>
             <div className="mx-auto overflow-y-auto">
               {messages.map((message: any, index: any) => {
-                //console.log(message)
                 return (
                   <div
                     key={index}

@@ -50,9 +50,7 @@ export default function LeftColumn({
 
   // console.log(timeRestrictions)
   useEffect(() => {
-    //console.log("parent changing")
     setData(activityList)
-    //console.log("parent changing")
 
     const sortedActivityList = [...activityList].sort(
       (a, b) => b.totalSeconds - a.totalSeconds
@@ -112,10 +110,8 @@ export default function LeftColumn({
                 .sort((a, b) => b.totalSeconds - a.totalSeconds)
                 .slice(0, 4)
                 .map((activity: any, index: any) => {
-                  //console.log(activity)
                   // {application: 'Visual Studio Code', totalSeconds: 3080, timeString: '51 minute(s)'}
-                  //console.log(svgDictionary)
-                  //console.log(activity.application)
+
                   // console.log(svgDictionary[activity.application])
                   const formattedTimeString = activity.timeString
                     .replace(/\bhour(s)?\b/g, "h")
