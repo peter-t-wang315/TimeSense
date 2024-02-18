@@ -1,8 +1,19 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./globals.css";
 
+import { ThemeProvider } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
+
+// GET localhost:3000/api -> GET api/route.js
+// POST localhost:3000/api -> POST api/route.js
+
+// POST localhost:3000/api/updatePingData -> POST api/updaePingData/route.jst
+// api/updatePingData/route.js -> POST code to resolve the post
+
+// fetch("api/updaePingData", method: "POST")
+// That is how we get data
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,8 +26,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang='en'>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='dark'
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
