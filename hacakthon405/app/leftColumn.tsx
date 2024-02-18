@@ -1,3 +1,4 @@
+"use client"
 import Chart from "chart.js/auto"
 import PieChart from "./pieChart"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,20 +26,28 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { useEffect, useState } from "react"
+import { svgDictionary } from "./svgDictionary"
 
-export default function LeftColumn() {
+export default function LeftColumn({ activityList }: any) {
   // <h1 className="text-bold text-2xl text-white">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).replace(/(\d+)(st|nd|rd|th)/, '$1<sup>$2</sup>')}</h1>
+  const [propsData, setData] = useState<any>(activityList)
+
+  useEffect(() => {
+    console.log("parent changing")
+    setData(activityList)
+    console.log("parent changing")
+
+    const sortedActivityList = [...activityList].sort(
+      (a, b) => b.totalSeconds - a.totalSeconds
+    )
+    const labels = sortedActivityList
+      ?.slice(0, 5)
+      .map((obj: any) => obj.application)
+    const values = sortedActivityList
+      ?.slice(0, 5)
+      .map((obj: any) => obj.totalSeconds)
+  }, [activityList])
 
   return (
     <>
@@ -59,7 +68,7 @@ export default function LeftColumn() {
             <h3 className="text-xl text-center font-semibold pb-2">
               My Day So Far
             </h3>
-            <PieChart />
+            <PieChart activityList={propsData} />
           </div>
         </div>
         <div className=" text-white p-4 pt-0 h-screen">
@@ -68,117 +77,34 @@ export default function LeftColumn() {
               Top Activity
             </h3>
             <div className="flex flex-col">
-              <div className="flex flex-row justify-between">
-                <div className="flex flex-row">
-                  <svg
-                    width="30px"
-                    height="30px"
-                    viewBox="0 -28.5 256 256"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid"
-                    fill="#000000"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      {" "}
-                      <g>
-                        {" "}
-                        <path
-                          d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"
-                          fill="#ffffff"
-                          fill-rule="nonzero"
-                        >
-                          {" "}
-                        </path>{" "}
-                      </g>{" "}
-                    </g>
-                  </svg>
-                  <h1 className="pl-3 text-lg font-light">Discord</h1>
-                </div>
-                <h1 className="pr-3 text-lg font-light">2h 41m</h1>
-              </div>
+              {[...activityList]
+                .sort((a, b) => b.totalSeconds - a.totalSeconds)
+                .slice(0, 3)
+                .map((activity: any, index: any) => {
+                  console.log(activity)
+                  // {application: 'Visual Studio Code', totalSeconds: 3080, timeString: '51 minute(s)'}
+                  console.log(svgDictionary)
+                  console.log(activity.application)
+                  console.log(svgDictionary[activity.application])
+                  return (
+                    <div
+                      className="flex flex-row justify-between pt-3"
+                      key={index}
+                    >
+                      <div className="flex flex-row">
+                        {
+                          //@ts-ignore
+                          svgDictionary[activity.application] || <h1>HELLOO</h1>
+                        }
 
-              <div className="flex flex-row justify-between pt-3">
-                <div className="flex flex-row">
-                  <svg
-                    width="30px"
-                    height="30px"
-                    viewBox="0 -7 48 48"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="#CE1312"
-                    stroke="#CE1312"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      {" "}
-                      <title>Youtube-color</title>{" "}
-                      <desc>Created with Sketch.</desc> <defs> </defs>{" "}
-                      <g
-                        id="Icons"
-                        stroke="none"
-                        stroke-width="1"
-                        fill="none"
-                        fill-rule="evenodd"
-                      >
-                        {" "}
-                        <g
-                          id="Color-"
-                          transform="translate(-200.000000, -368.000000)"
-                          fill="#CE1312"
-                        >
-                          {" "}
-                          <path
-                            d="M219.044,391.269916 L219.0425,377.687742 L232.0115,384.502244 L219.044,391.269916 Z M247.52,375.334163 C247.52,375.334163 247.0505,372.003199 245.612,370.536366 C243.7865,368.610299 241.7405,368.601235 240.803,368.489448 C234.086,368 224.0105,368 224.0105,368 L223.9895,368 C223.9895,368 213.914,368 207.197,368.489448 C206.258,368.601235 204.2135,368.610299 202.3865,370.536366 C200.948,372.003199 200.48,375.334163 200.48,375.334163 C200.48,375.334163 200,379.246723 200,383.157773 L200,386.82561 C200,390.73817 200.48,394.64922 200.48,394.64922 C200.48,394.64922 200.948,397.980184 202.3865,399.447016 C204.2135,401.373084 206.612,401.312658 207.68,401.513574 C211.52,401.885191 224,402 224,402 C224,402 234.086,401.984894 240.803,401.495446 C241.7405,401.382148 243.7865,401.373084 245.612,399.447016 C247.0505,397.980184 247.52,394.64922 247.52,394.64922 C247.52,394.64922 248,390.73817 248,386.82561 L248,383.157773 C248,379.246723 247.52,375.334163 247.52,375.334163 L247.52,375.334163 Z"
-                            id="Youtube"
-                          >
-                            {" "}
-                          </path>{" "}
-                        </g>{" "}
-                      </g>{" "}
-                    </g>
-                  </svg>
-                  <h1 className="pl-3 text-lg font-light">YouTube</h1>
-                </div>
-                <h1 className="pr-3 text-lg font-light">1h 31m</h1>
-              </div>
-
-              <div className="flex flex-row justify-between pt-3">
-                <div className="flex flex-row">
-                  <svg
-                    fill="#ffffff"
-                    width="30px"
-                    height="30px"
-                    viewBox="0 0 24.00 24.00"
-                    role="img"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      <title>Riot Games icon</title>
-                      <path d="M12.534 21.77l-1.09-2.81 10.52.54-.451 4.5zM15.06 0L.307 6.969 2.59 17.471H5.6l-.52-7.512.461-.144 1.81 7.656h3.126l-.116-9.15.462-.144 1.582 9.294h3.31l.78-11.053.462-.144.82 11.197h4.376l1.54-15.37Z"></path>
-                    </g>
-                  </svg>
-                  <h1 className="pl-3 text-lg font-light">League of Legends</h1>
-                </div>
-                <h1 className="pr-3 text-lg font-light">2h 41m</h1>
-              </div>
+                        <h1 className="pl-3 text-lg font-light">
+                          {activity.application}
+                        </h1>
+                      </div>
+                      <h1 className="pr-3 text-lg font-light">1h 31m</h1>
+                    </div>
+                  )
+                })}
             </div>
           </div>
         </div>
