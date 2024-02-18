@@ -1,6 +1,6 @@
 const nextConfig = {
   output: "export",
-  reactStrictMode: false
-};
+  reactStrictMode: false,
+}
 
-export default nextConfig;
+export default nextConfig
