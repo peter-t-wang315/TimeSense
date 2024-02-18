@@ -18,7 +18,10 @@ export default function Home() {
       invoke<string>("on_button_clicked")
         .then((value) => {
           // console.log("TRIGGERED WITHIN REACT", value)
-          createData(value)
+          console.log("Value:", value)
+          if (!(value[0] === "BROKEN")) {
+            createData(value)
+          }
         })
         .catch(() => {
           console.log("TRIGGERED WITHIN")
