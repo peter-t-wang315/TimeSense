@@ -1,15 +1,12 @@
-"use client";
-import Image from "next/image";
-import { invoke } from "@tauri-apps/api/tauri";
-import { useEffect } from "react";
-import LeftColumn from "./leftColumn";
-import RightColumn from "./rightColumn";
+"use client"
+import Image from "next/image"
+import { invoke } from "@tauri-apps/api/tauri"
+import { useEffect } from "react"
+import LeftColumn from "./leftColumn"
+import RightColumn from "./rightColumn"
 import { createData, getDayData } from "./actions"
 
 export default function Home() {
-  const onButtonClick = () => {
-    console.log("??");
-  };
   useEffect(() => {
     const interval = setInterval(() => {
       // Code to run every 5 seconds
@@ -32,15 +29,15 @@ export default function Home() {
   }
 
   return (
-    <div className='w-screen h-screen bg-gray-200'>
-      <div className='flex'>
-        <div className='bg-slate-950 h-screen w-[400px] flex-none '>
+    <div className="w-screen h-screen bg-gray-200">
+      <div className="flex">
+        <div className="bg-slate-950 h-screen w-[350px] flex-none ">
           <LeftColumn />
         </div>
-        <div className='flex-1 bg-slate-900 h-screen p-4'>
+        <div className="flex-1 bg-slate-900 h-screen p-4">
           <RightColumn />
         </div>
       </div>
     </div>
-  );
+  )
 }

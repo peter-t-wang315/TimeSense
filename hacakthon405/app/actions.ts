@@ -86,5 +86,6 @@ export async function getDayData() {
       }
     }
   )
+
   console.log("Query done")
 }

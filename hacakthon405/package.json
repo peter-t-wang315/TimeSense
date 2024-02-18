@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -17,6 +18,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@tauri-apps/api": "^1.5.3",
+    "@tauri-apps/cli-win32-x64-msvc": "^2.0.0-alpha.9",
     "@types/react-big-calendar": "^1.8.8",
     "chart.js": "^4.4.1",
     "class-variance-authority": "^0.7.0",
