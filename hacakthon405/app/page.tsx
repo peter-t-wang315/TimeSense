@@ -4,7 +4,12 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { useEffect } from "react"
 import LeftColumn from "./leftColumn"
 import RightColumn from "./rightColumn"
-import { createData, getData } from "./actions"
+import {
+  createData,
+  getDailyData,
+  getWeeklyData,
+  getMonthlyData,
+} from "./actions"
 
 export default function Home() {
   useEffect(() => {
@@ -26,13 +31,17 @@ export default function Home() {
 
   const onButtonClick = async () => {
     // Get the start of the current day
-    const startOfDay = new Date(2024, 1, 15)
-    startOfDay.setHours(0, 0, 0, 0)
-    const startOfDayTimestamp = startOfDay.getTime()
-    console.log("STart", startOfDayTimestamp)
-    const data = await getData(startOfDayTimestamp).then((res) => {
+    // const startOfDay = new Date(2024, 1, 15)
+    // startOfDay.setHours(0, 0, 0, 0)
+    // const startOfDayTimestamp = startOfDay.getTime()
+    // const data = await getData(startOfDayTimestamp).then((res) => {
+    //   return res
+    // })
+
+    const data = await getMonthlyData().then((res) => {
       return res
     })
+    console.log("data", data)
   }
 
   return (
