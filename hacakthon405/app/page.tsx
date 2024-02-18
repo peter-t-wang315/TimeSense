@@ -50,12 +50,9 @@ export default function Home() {
 
   const onButtonClick = async () => {
     // Get the start of the current day
-    // const startOfDay = new Date(2024, 1, 15)
-    // startOfDay.setHours(0, 0, 0, 0)
-    // const startOfDayTimestamp = startOfDay.getTime()
-    // const data = await getData(startOfDayTimestamp).then((res) => {
-    //   return res
-    // })
+    const startOfDay = new Date(2024, 1, 15)
+    startOfDay.setHours(0, 0, 0, 0)
+    const startOfDayTimestamp = startOfDay.getTime()
 
     const data = await getMonthlyData().then((res) => {
       return res
