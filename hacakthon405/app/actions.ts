@@ -64,19 +64,24 @@ export async function createData(values) {
   )
 }
 
-export async function getDayData() {
+export async function getDayData(startTimestamp) {
   db = new sqlite3.Database("./userData.db")
 
-  // Get the start of the current day
-  const startOfDay = new Date()
-  startOfDay.setHours(0, 0, 0, 0)
-  const startOfDayTimestamp = startOfDay.getTime()
-
-  console.log("Start of day", startOfDayTimestamp)
-
   db.all(
-    "SELECT * FROM userData WHERE timestamp > ?",
-    startOfDayTimestamp,
+    "SELECT application, " +
+      "COUNT(*) * 5 AS totalSeconds, " +
+      "CASE " +
+      "WHEN COUNT(*) * 5 >= 60*60*24*7 THEN (COUNT(*) * 5 / (60*60*24*7)) || ' week(s)' " +
+      "WHEN COUNT(*) * 5 >= 60*60*24 THEN (COUNT(*) * 5 / (60*60*24)) || ' day(s)' " +
+      "WHEN COUNT(*) * 5 >= 60*60 THEN " +
+      "  FLOOR((COUNT(*) * 5) / (60*60)) || ' hour(s) ' || " +
+      "  FLOOR(((COUNT(*) * 5) % (60*60)) / 60) || ' minute(s)' " +
+      "WHEN COUNT(*) * 5 >= 60 THEN (COUNT(*) * 5 / 60) || ' minute(s)' " +
+      "WHEN COUNT(*) * 5 < 60 THEN '<1 minute' " +
+      "ELSE COUNT(*) * 5 || ' second(s)' " +
+      "END AS timeString " +
+      "FROM userData WHERE timestamp > ? GROUP BY application",
+    startTimestamp,
     (err, rows) => {
       if (err) {
         console.log("ERROR")
