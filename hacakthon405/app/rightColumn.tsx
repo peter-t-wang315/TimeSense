@@ -17,8 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getMonthlyData } from "./actions"
 
 const localizer = momentLocalizer(moment)
-
-const OPENAI_API_KEY = ""
+const OPENAI_API_KEY = "   "
 
 export const LoadingSpinner = ({ className }: any) => {
   ;<>
