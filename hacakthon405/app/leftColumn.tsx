@@ -78,6 +78,8 @@ export default function LeftColumn({
     return { hours, minutes }
   }
 
+  async function processChatGPTMessage() {}
+
   return (
     <>
       <div className="flex flex-col h-[100%]">
@@ -177,14 +179,12 @@ export default function LeftColumn({
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>Profile</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setTimeIsOpen(true)}>
                         Time Restrictions
                       </DropdownMenuItem>
-                      <DropdownMenuItem>Settings</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => getPermissions()}>
+                      {/*<DropdownMenuItem onClick={() => getPermissions()}>
                         Notification Settings
-                      </DropdownMenuItem>
+                        </DropdownMenuItem>*/}
                       <DropdownMenuItem onClick={() => setSafetyIsOpen(true)}>
                         Data Safety Policy
                         {/*<DropdownMenuShortcut>⌘K</DropdownMenuShortcut>*/}
