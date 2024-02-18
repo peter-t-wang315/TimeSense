@@ -7,7 +7,7 @@
     "distDir": "../out"
   },
   "package": {
-    "productName": "hacakthon405",
+    "productName": "TimeSense",
     "version": "0.1.0"
   },
   "tauri": {
@@ -58,7 +58,7 @@
         "fullscreen": false,
         "height": 811,
         "resizable": false,
-        "title": "hacakthon405Title",
+        "title": "TimeSense",
         "width": 1444
       }
     ]
