@@ -36,38 +36,23 @@ import {
   sendNotification,
 } from "@tauri-apps/api/notification"
 
-function stringToTimestamp(input: string): number {
-  const matches = input.match(/(\d+\s*h)?\s*(\d+\s*m)?/)
-  if (!matches) {
-    throw new Error(
-      "Invalid input format. Expected format: 'Xh Ym', 'Xh', or 'Ym'"
-    )
-  }
-
-  let hours = 0
-  if (matches[1]) {
-    hours = parseInt(matches[1], 10)
-  }
-
-  const minutes = parseInt(matches[matches.length - 1], 10)
-  return (hours * 60 + minutes) * 60
-}
-
-export default function LeftColumn({ activityList }: any) {
+export default function LeftColumn({
+  activityList,
+  timeRestrictions,
+  setTimeRestrictions,
+  timeRestrictionsDelay,
+  setTimeRestrictionDelay,
+}: any) {
   // <h1 className="text-bold text-2xl text-white">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).replace(/(\d+)(st|nd|rd|th)/, '$1<sup>$2</sup>')}</h1>
   const [propsData, setData] = useState<any>(activityList)
   const [safetyIsOpen, setSafetyIsOpen] = useState<any>(false)
   const [timeIsOpen, setTimeIsOpen] = useState<any>(false)
-  const [timeRestrictions, setTimeRestrictions] = useState<any>({
-    Instagram: "1h 20m",
-    Discord: "1m",
-    YouTube: "20m",
-  })
+
   // console.log(timeRestrictions)
   useEffect(() => {
-    console.log("parent changing")
+    //console.log("parent changing")
     setData(activityList)
-    console.log("parent changing")
+    //console.log("parent changing")
 
     const sortedActivityList = [...activityList].sort(
       (a, b) => b.totalSeconds - a.totalSeconds
@@ -78,46 +63,15 @@ export default function LeftColumn({ activityList }: any) {
     const values = sortedActivityList
       ?.slice(0, 5)
       .map((obj: any) => obj.totalSeconds)
-
-    activityList.map(async (activity: any, index: number) => {
-      const activitySeconds = activity.totalSeconds
-      console.log("MAPPING ACTIVITY: ", activity.application)
-      sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
-      if (
-        activity.application === "Instagram" ||
-        activity.application === "Discord" ||
-        activity.application === "YouTube"
-      ) {
-        const timeLimitSeconds = stringToTimestamp(
-          timeRestrictions[activity.application]
-        )
-        /**/
-
-        console.log("Time limit: ", timeLimitSeconds)
-        console.log("Activity Seconds: ", activitySeconds)
-        if (activitySeconds >= timeLimitSeconds) {
-          // && activity % 60 === 0) {
-          sendNotification("Tauri is awesome!")
-          sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
-
-          // console.log("OVER OVER OVER")
-        }
-      }
-    })
   }, [activityList])
 
-  useEffect(() => {
-    async function getPermissions() {
-      let permissionGranted = await isPermissionGranted()
-      if (!permissionGranted) {
-        const permission = await requestPermission()
-        permissionGranted = permission === "granted"
-      }
-      sendNotification("Tauri is awesome!")
-      sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
+  async function getPermissions() {
+    let permissionGranted = await isPermissionGranted()
+    if (!permissionGranted) {
+      const permission = await requestPermission()
+      permissionGranted = permission === "granted"
     }
-    getPermissions()
-  }, [])
+  }
 
   function convertToHoursMinutes(totalSeconds: number) {
     const hours = Math.floor(totalSeconds / 3600) // Get the whole hours
@@ -158,10 +112,10 @@ export default function LeftColumn({ activityList }: any) {
                 .sort((a, b) => b.totalSeconds - a.totalSeconds)
                 .slice(0, 4)
                 .map((activity: any, index: any) => {
-                  console.log(activity)
+                  //console.log(activity)
                   // {application: 'Visual Studio Code', totalSeconds: 3080, timeString: '51 minute(s)'}
-                  console.log(svgDictionary)
-                  console.log(activity.application)
+                  //console.log(svgDictionary)
+                  //console.log(activity.application)
                   // console.log(svgDictionary[activity.application])
                   const formattedTimeString = activity.timeString
                     .replace(/\bhour(s)?\b/g, "h")
@@ -232,6 +186,9 @@ export default function LeftColumn({ activityList }: any) {
                         Time Restrictions
                       </DropdownMenuItem>
                       <DropdownMenuItem>Settings</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => getPermissions()}>
+                        Notification Settings
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setSafetyIsOpen(true)}>
                         Data Safety Policy
                         {/*<DropdownMenuShortcut>⌘K</DropdownMenuShortcut>*/}

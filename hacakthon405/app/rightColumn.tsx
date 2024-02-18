@@ -127,7 +127,7 @@ export default function RightColumn({ activityList }: any) {
             </div>
             <div className="mx-auto overflow-y-auto">
               {messages.map((message: any, index: any) => {
-                console.log(message)
+                //console.log(message)
                 return (
                   <div
                     key={index}
