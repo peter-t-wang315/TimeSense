@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image"
 import { invoke } from "@tauri-apps/api/tauri"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import LeftColumn from "./leftColumn"
 import RightColumn from "./rightColumn"
 import {
@@ -12,20 +12,36 @@ import {
 } from "./actions"
 
 export default function Home() {
+  const [activityList, setActivityList] = useState<any>([])
+
   useEffect(() => {
-    const interval = setInterval(() => {
+    async function getDataInitial() {
+      const data = await getDailyData().then((res) => {
+        setActivityList(res)
+        return res
+      })
+    }
+    getDataInitial()
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
       // Code to run every 5 seconds
-      invoke<string>("on_button_clicked")
-        .then((value) => {
+      const data = await invoke<string>("on_button_clicked")
+        .then(async (value) => {
           // console.log("TRIGGERED WITHIN REACT", value)
-          console.log("Value:", value)
-          if (!(value[0] === "BROKEN")) {
-            createData(value)
-          }
+          createData(value)
+          const data = await getDailyData().then((res) => {
+            return res
+          })
+          return data
         })
         .catch(() => {
           console.log("TRIGGERED WITHIN")
         })
+      console.log("FUDGEE")
+      console.log(data)
+      setActivityList(data)
     }, 5000) // 5000 milliseconds = 5 seconds
 
     // Cleanup function to clear the interval when component unmounts or effect re-runs
@@ -50,15 +66,15 @@ export default function Home() {
   return (
     <div className="w-screen h-screen bg-gray-200">
       <div className="flex">
-        <div className="bg-slate-950 h-screen w-[400px] flex-none ">
-          <LeftColumn />
+        <div className="bg-slate-950 h-screen w-[350px] flex-none ">
+          <LeftColumn activityList={activityList} />
         </div>
         <div className="flex-1 bg-slate-900 h-screen p-4">
-          <RightColumn />
+          <RightColumn activityList={activityList} />
         </div>
-        <div>
+        {/*<div>
           <button onClick={onButtonClick}>CLICK ME MOTHERFUCKER</button>
-        </div>
+        </div>*/}
       </div>
     </div>
   )
