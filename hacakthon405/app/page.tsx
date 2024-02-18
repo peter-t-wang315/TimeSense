@@ -10,9 +10,42 @@ import {
   getWeeklyData,
   getMonthlyData,
 } from "./actions"
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from "@tauri-apps/api/notification"
+
+function stringToTimestamp(input: string): number {
+  const matches = input.match(/(\d+\s*h)?\s*(\d+\s*m)?/)
+  if (!matches) {
+    throw new Error(
+      "Invalid input format. Expected format: 'Xh Ym', 'Xh', or 'Ym'"
+    )
+  }
+
+  let hours = 0
+  if (matches[1]) {
+    hours = parseInt(matches[1], 10)
+  }
+
+  const minutes = parseInt(matches[matches.length - 1], 10)
+  return (hours * 60 + minutes) * 60
+}
 
 export default function Home() {
   const [activityList, setActivityList] = useState<any>([])
+  const [lastPinged, setLastPinged] = useState<any>("")
+  const [timeRestrictions, setTimeRestrictions] = useState<any>({
+    Instagram: "1h 20m",
+    Discord: "1m",
+    YouTube: "20m",
+  })
+  const [timeRestrictionsDelay, setTimeRestrictionDelay] = useState<any>({
+    Instagram: 0,
+    Discord: 0,
+    YouTube: 0,
+  })
 
   useEffect(() => {
     async function getDataInitial() {
@@ -33,8 +66,47 @@ export default function Home() {
           if (!(value[0] === "BROKEN")) {
             createData(value)
           }
-          const data = await getDailyData().then((res) => {
+
+          const data: any = await getDailyData().then((res) => {
             return res
+          })
+          data.map(async (activity: any, index: number) => {
+            let activitySeconds = activity.totalSeconds
+            console.log("MAPPING ACTIVITY: ", activity.application)
+            // sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
+            if (
+              activity.application === "Instagram" ||
+              activity.application === "Discord" ||
+              activity.application === "YouTube"
+            ) {
+              let timeLimitSeconds = stringToTimestamp(
+                timeRestrictions[activity.application]
+              )
+
+              if (
+                activitySeconds >= timeLimitSeconds &&
+                (((activitySeconds - timeLimitSeconds) % 60 == 0 &&
+                  lastPinged !== activity.application) ||
+                  ((activitySeconds - timeLimitSeconds) % 60 == 0 &&
+                    lastPinged == activity.application))
+              ) {
+                sendNotification({
+                  title: "TimeSense Alert",
+                  body:
+                    "You are over your time restriction for " +
+                    activity.application +
+                    " by " +
+                    (activitySeconds - timeLimitSeconds) +
+                    "seconds",
+                })
+                setLastPinged(activity.application)
+
+                // console.log("OVER OVER OVER")
+              }
+              if (activity.application !== lastPinged) {
+                setLastPinged(activity.application)
+              }
+            }
           })
           return data
         })
@@ -43,7 +115,7 @@ export default function Home() {
         })
       setActivityList(data)
     }, 5000) // 5000 milliseconds = 5 seconds
-
+    setActivityList(activityList)
     // Cleanup function to clear the interval when component unmounts or effect re-runs
     return () => clearInterval(interval)
   }, [])
@@ -64,7 +136,13 @@ export default function Home() {
     <div className="w-screen h-screen bg-gray-200">
       <div className="flex">
         <div className="bg-slate-950 h-screen w-[350px] flex-none ">
-          <LeftColumn activityList={activityList} />
+          <LeftColumn
+            activityList={activityList}
+            timeRestrictions={timeRestrictions}
+            setTimeRestrictions={setTimeRestrictions}
+            timeRestrictionsDelay={timeRestrictionsDelay}
+            setTimeRestrictionDelay={setTimeRestrictionDelay}
+          />
         </div>
         <div className="flex-1 bg-slate-900 h-screen p-4">
           <RightColumn activityList={activityList} />
