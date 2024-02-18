@@ -36,6 +36,12 @@ function stringToTimestamp(input: string): number {
 export default function Home() {
   const [activityList, setActivityList] = useState<any>([])
   const [lastPinged, setLastPinged] = useState<any>("")
+  const [hasPingedInitial, setHasPingedInitial] = useState<any>(false)
+  const [hasPinged, setHasPinged] = useState({
+    Instagram: 0,
+    Discord: 0,
+    YouTube: 0,
+  })
   const [timeRestrictions, setTimeRestrictions] = useState<any>({
     Instagram: "1h 20m",
     Discord: "1m",
@@ -72,7 +78,7 @@ export default function Home() {
           })
           data.map(async (activity: any, index: number) => {
             let activitySeconds = activity.totalSeconds
-            console.log("MAPPING ACTIVITY: ", activity.application)
+            // console.log("MAPPING ACTIVITY: ", activity.application)
             // sendNotification({ title: "TAURI", body: "Tauri is awesome!" })
             if (
               activity.application === "Instagram" ||
@@ -85,27 +91,35 @@ export default function Home() {
 
               if (
                 activitySeconds >= timeLimitSeconds &&
-                (((activitySeconds - timeLimitSeconds) % 60 == 0 &&
-                  lastPinged !== activity.application) ||
+                (activitySeconds - timeLimitSeconds) % 20 == 0 &&
+                lastPinged[activity.application] != activitySeconds /*||
                   ((activitySeconds - timeLimitSeconds) % 60 == 0 &&
-                    lastPinged == activity.application))
+                    lastPinged == activity.application))*/
               ) {
-                sendNotification({
-                  title: "TimeSense Alert",
-                  body:
-                    "You are over your time restriction for " +
-                    activity.application +
-                    " by " +
-                    (activitySeconds - timeLimitSeconds) +
-                    "seconds",
-                })
+                if (!hasPingedInitial) {
+                  /*sendNotification({
+                    title: "TimeSense Alert",
+                    body:
+                      "You are over your time restriction for " +
+                      activity.application +
+                      " by " +
+                      (activitySeconds - timeLimitSeconds) +
+                      "seconds",
+                  })*/
+                  /*setHasPinged((prevState) => ({
+                    ...prevState,
+                    [activity.application]: activitySeconds,
+                  }))*/
+                  setHasPingedInitial(true)
+                }
+
                 setLastPinged(activity.application)
 
                 // console.log("OVER OVER OVER")
               }
-              if (activity.application !== lastPinged) {
+              /*if (activity.application !== lastPinged) {
                 setLastPinged(activity.application)
-              }
+              }*/
             }
           })
           return data

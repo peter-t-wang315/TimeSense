@@ -18,25 +18,110 @@ import { getMonthlyData } from "./actions"
 
 const localizer = momentLocalizer(moment)
 
+const OPENAI_API_KEY = "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"
+
+export const LoadingSpinner = ({ className }: any) => {
+  ;<>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={"animate-spin " + className}
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  </>
+}
+
 export default function RightColumn({ activityList }: any) {
+  const [messageInput, setMessageInput] = useState<any>("")
+  const [showSpinner, setShowSpinner] = useState(false)
+
   const [messages, setMessages] = useState<any>([
     {
-      name: "chat",
-      message: "Hey, I'm ChatGPT! Are you interested in XYZ?",
-    },
-    {
-      name: "user",
-      message: "Hey, I'm ChatGPT! Are you interested in XYZ?",
-    },
-    {
-      name: "chat",
-      message: "Hey, I'm ChatGPT! Are you interested in XYZ?",
-    },
-    {
-      name: "user",
-      message: "Hey, I'm ChatGPT! Are you interested in XYZ?",
+      role: "assistant",
+      content: [
+        {
+          type: "text",
+          text: "Hey, I'm your personal AI assitant to help you better understand your schedule, and how to use your time more effectively.",
+        },
+      ],
     },
   ])
+
+  async function getChatGPTResponse(textInput: string) {
+    setMessageInput("")
+    setMessages((prevMessages: any) => [
+      ...prevMessages,
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: textInput,
+          },
+        ],
+      },
+    ])
+    const requestData = {
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Be a helpful assistant for time management, productivty, and relaed topics. Be relatively concise in your answers as the window you are chatting in is small. Make sure to look at the users SCHEDULE CONTEXT for data on how to help them. Scheduled events are structured like { title: 'name of event', start: starting timestamp, end: ending timestamp}",
+        },
+        ...messages,
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `${textInput}  
+
+                  SCHEDULE CONTEXT
+                  ${JSON.stringify(calendarEvents)}`,
+            },
+          ],
+        },
+      ],
+    }
+    fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify(requestData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        setMessages((prevMessages: any) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: [
+              {
+                type: "text",
+                text: data.choices[0].message.content,
+              },
+            ],
+          },
+        ])
+        setShowSpinner(false)
+      })
+      .catch((error) => {
+        setShowSpinner(false)
+        console.error("Error:", error)
+      })
+  }
 
   const [calendarEvents, setCalendarEvents] = useState<any>([])
 
@@ -51,7 +136,7 @@ export default function RightColumn({ activityList }: any) {
       const startDate = new Date()
       startDate.setHours(0, 0, 0, 0)
       let currentHour = 1
-      console.log("sorted activityList", sortedActivityList)
+      // console.log("sorted activityList", sortedActivityList)
 
       sortedActivityList.slice(0, 3).map((item, index) => {
         const formattedTimeString = item.timeString
@@ -68,7 +153,7 @@ export default function RightColumn({ activityList }: any) {
         currentHour += 1
       })
 
-      console.log("iausd", newCalendarEvents)
+      // console.log("iausd", newCalendarEvents)
       // Update the state with the newCalendarEvents array
       setCalendarEvents(newCalendarEvents)
     }
@@ -105,6 +190,17 @@ export default function RightColumn({ activityList }: any) {
     generateCalendarEvents()
   }, [])
 
+  const handleKeyPress = (e: any) => {
+    // Check if the Enter key was pressed
+    if (e.key === "Enter") {
+      // Call the function to send the message
+      setShowSpinner(true)
+      setMessageInput("")
+      getChatGPTResponse(messageInput)
+    }
+  }
+  console.log(messageInput)
+
   return (
     <>
       <div className="h-full justify-center pt-6 w-full">
@@ -121,7 +217,7 @@ export default function RightColumn({ activityList }: any) {
               Chat With Your Data
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[625px]">
+          <DialogContent className="sm:max-w-[625px] h-[650px]">
             <DialogHeader>
               <DialogTitle>Chat With Your Data</DialogTitle>
               <DialogDescription>
@@ -130,36 +226,82 @@ export default function RightColumn({ activityList }: any) {
               </DialogDescription>
             </DialogHeader>
             <div className="w-[580px] mx-auto">
-              <div className="w-full mx-auto">
+              <div className="w-full mx-auto h-[550px] max-h-[550px]  flex flex-col">
                 {/* Chat Messages */}
-                <div className="flex justify-start">
-                  <div className="bg-gray-200 p-2 rounded-lg max-w-xs">
-                    <p className="text-sm text-black">Left side chat message</p>
-                  </div>
+                <Button
+                  className="w-[120px] text-sm mb-4"
+                  variant={"ghost"}
+                  size={"sm"}
+                  onClick={() => {
+                    setMessages([])
+                  }}
+                >
+                  Clear Chat
+                </Button>
+                <div></div>
+                <div className="h-[540px] max-h-[540px] overflow-y-auto border-t-slate-800 border-t-2">
+                  {messages.map((message: any, index: any) => (
+                    <div
+                      key={index}
+                      className={
+                        message.role === "assistant"
+                          ? "flex justify-start"
+                          : "flex justify-end"
+                      }
+                    >
+                      <div
+                        className={
+                          message.role === "assistant"
+                            ? "bg-gray-200 p-2 text-black rounded-lg max-w-xs mt-3"
+                            : "bg-blue-500 text-white p-2 rounded-lg max-w-xs mt-3"
+                        }
+                      >
+                        <p className="text-sm">{message.content[0].text}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {showSpinner ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={"animate-spin"}
+                    >
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                  ) : (
+                    <> </>
+                  )}
                 </div>
-                <div className="flex justify-end">
-                  <div className="bg-blue-500 text-white p-2 rounded-lg max-w-xs">
-                    <p className="text-sm">Right side chat message</p>
-                  </div>
+                <div className="flex flex-grow w-full max-w-xl items-center space-x-2 mt-4">
+                  <Input
+                    type="text"
+                    placeholder="Send a message..."
+                    value={messageInput}
+                    onChange={(e) => {
+                      setMessageInput(e.target.value)
+                      console.log(messages)
+                    }}
+                    onKeyPress={handleKeyPress}
+                  />
+                  <Button
+                    onClick={() => {
+                      setShowSpinner(true)
+                      setMessageInput("")
+                      getChatGPTResponse(messageInput)
+                    }}
+                  >
+                    Send Message
+                  </Button>
                 </div>
                 {/* Add more chat messages here */}
               </div>
-            </div>
-            <div className="mx-auto overflow-y-auto">
-              {messages.map((message: any, index: any) => {
-                return (
-                  <div
-                    key={index}
-                    className={`${
-                      message.name === "chat" ? "bg-green-700" : "bg-gray-800"
-                    } p-2 rounded-lg my-2 mx-2 ${
-                      message.name === "chat" ? "justify-left" : "justify-right"
-                    }`}
-                  >
-                    <p className="text-sm">{message.message}</p>
-                  </div>
-                )
-              })}
             </div>
           </DialogContent>
         </Dialog>
