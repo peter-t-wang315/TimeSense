@@ -166,7 +166,7 @@ export async function getMonthlyData() {
   // FEB IS HARDCODED
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const todayTimestamp = today.getTime()
+  const todayTimestamp = today.getTime() + 86400000
   const startOfDay = new Date(2024, 1, 1, 0, 0, 0, 0)
   let startOfDayTimestamp = startOfDay.getTime()
   let output = []
