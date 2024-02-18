@@ -22,7 +22,7 @@ fn on_button_clicked() -> Result<(String, String), &'static str> {
       },
       Err(()) => {
           println!("error occurred while getting the active window");
-          return Err("Error getting active window");
+          return Ok(("BROKEN".to_string(), "BROKEN".to_string()));
       }
   }
 }

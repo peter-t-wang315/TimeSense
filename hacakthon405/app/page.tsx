@@ -4,18 +4,19 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { useEffect, useState } from "react"
 import LeftColumn from "./leftColumn"
 import RightColumn from "./rightColumn"
-import { createData, getData } from "./actions"
+import {
+  createData,
+  getDailyData,
+  getWeeklyData,
+  getMonthlyData,
+} from "./actions"
 
 export default function Home() {
   const [activityList, setActivityList] = useState<any>([])
 
   useEffect(() => {
     async function getDataInitial() {
-      const startOfDay = new Date(2024, 1, 15)
-      startOfDay.setHours(0, 0, 0, 0)
-      const startOfDayTimestamp = startOfDay.getTime()
-      console.log("STart", startOfDayTimestamp)
-      const data = await getData(startOfDayTimestamp).then((res) => {
+      const data = await getDailyData().then((res) => {
         setActivityList(res)
         return res
       })
@@ -30,18 +31,10 @@ export default function Home() {
         .then(async (value) => {
           // console.log("TRIGGERED WITHIN REACT", value)
           createData(value)
-          const startOfDay = new Date(2024, 1, 15)
-          startOfDay.setHours(0, 0, 0, 0)
-          const startOfDayTimestamp = startOfDay.getTime()
-          console.log("STart", startOfDayTimestamp)
-          const data = await getData(startOfDayTimestamp).then((res) => {
+          const data = await getDailyData().then((res) => {
             return res
           })
-          //console.log(data)
-          //console.log("HERE")
-          //console.log(activityList)
           return data
-          //forceRenderActivityList(activityList)
         })
         .catch(() => {
           console.log("TRIGGERED WITHIN")
@@ -55,20 +48,19 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [])
 
-  function forceRenderActivityList(activityList: any) {
-    setActivityList(activityList)
-  }
-
   const onButtonClick = async () => {
     // Get the start of the current day
-    const startOfDay = new Date(2024, 1, 15)
-    startOfDay.setHours(0, 0, 0, 0)
-    const startOfDayTimestamp = startOfDay.getTime()
-    console.log("STart", startOfDayTimestamp)
-    const data = await getData(startOfDayTimestamp).then((res) => {
+    // const startOfDay = new Date(2024, 1, 15)
+    // startOfDay.setHours(0, 0, 0, 0)
+    // const startOfDayTimestamp = startOfDay.getTime()
+    // const data = await getData(startOfDayTimestamp).then((res) => {
+    //   return res
+    // })
+
+    const data = await getMonthlyData().then((res) => {
       return res
     })
-    console.log("data ", data)
+    console.log("data", data)
   }
 
   return (
