@@ -25,7 +25,12 @@ export default function Home() {
   }, [])
 
   const onButtonClick = () => {
-    getDayData()
+    // Get the start of the current day
+    const startOfDay = new Date(2024, 1, 15)
+    startOfDay.setHours(0, 0, 0, 0)
+    const startOfDayTimestamp = startOfDay.getTime()
+    console.log("STart", startOfDayTimestamp)
+    getDayData(startOfDayTimestamp)
   }
 
   return (
@@ -36,6 +41,9 @@ export default function Home() {
         </div>
         <div className="flex-1 bg-slate-900 h-screen p-4">
           <RightColumn />
+        </div>
+        <div>
+          <button onClick={onButtonClick}>CLICK ME MOTHERFUCKER</button>
         </div>
       </div>
     </div>
