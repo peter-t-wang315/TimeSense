@@ -1,6 +1,6 @@
 # TimeSense
 
-Welcome to the TimeSense repo! TimeSense was built using Tauri, SQLite, NextJS, Rust, TypeScript, Tailwind CSS, and a touch of JavaScript and other things!
+Welcome to the TimeSense repo the 1st place project of the WSU CrimsonCode Hackathon 2024! TimeSense was built using Tauri, SQLite, NextJS, Rust, TypeScript, Tailwind CSS, and a touch of JavaScript and other things!
 
 ## Project Summary
 
