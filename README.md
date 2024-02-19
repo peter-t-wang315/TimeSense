@@ -4,9 +4,11 @@ Welcome to the TimeSense repo! TimeSense was built using Tauri, SQLite, NextJS, 
 
 ## Project Summary
 
-### Video
+![TimeSense Demo Vide](https://github.com/peter-t-wang315/CrimsonCode405/blob/final_readme/hacakthon405/public/TimeSenseDemo.gif)
 
 Introducing TimeSense! A lightweight easy to use productivity tracker and powerful tool designed to enhance your efficiency and accountability. With the ability to track your application usage and provide detailed analytics, it empowers you to make informed decisions about your time management. Our integration with ChatGPT further enhances your productivity by offering personalized suggestions and tips. Take control of your day with our productivity tracker and unlock your full potential.
+
+This app will work on mac but is slightly more optimized for windows.
 
 ## Prerequisites
 
