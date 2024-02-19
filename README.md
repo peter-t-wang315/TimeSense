@@ -19,17 +19,12 @@ Make sure you have the following:
 ## Installation
 
 1. `git clone git@github.com:peter-t-wang315/CrimsonCode405.git`
-
    - Make sure that your SSH key is on github if you are going to clone using SSH!
-
 2. `cd hackathon405`
-
    - cd where the code actually lives
-
 3. `npm install`
    - Download all of the dependencies you'll be needing
 4. You're done! Happy developing!
-
    - All of your dependencies that you need should be ready to go!
 
 ## Running The Code
